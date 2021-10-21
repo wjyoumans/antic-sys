@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2018"
 authors = ["William Youmans <wyoumans@usf.edu>"]
 description = "Bindings to the Antic library"
-homepage = "https://github.com/wyoumansUSF/antic-sys"
-repository = "https://github.com/wyoumansUSF/antic-sys"
-license = "LGPL-3.0+" 
+homepage = "https://github.com/wjyoumans/antic-sys"
+repository = "https://github.com/wjyoumans/antic-sys"
+license = "MIT OR Apache-2.0" 
 keywords = ["flint", "number-theory", "math"]
 categories = ["algorithms", "external-ffi-bindings", "mathematics"]
 readme = "README.md"
@@ -15,3 +15,4 @@ readme = "README.md"
 
 [dependencies]
 flint-sys = "0.4"
+
