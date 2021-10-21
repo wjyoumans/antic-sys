@@ -1,6 +1,6 @@
 [package]
 name = "antic-sys"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2018"
 authors = ["William Youmans <wyoumans@usf.edu>"]
 description = "Bindings to the Antic library"
