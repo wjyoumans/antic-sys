@@ -1,6 +1,6 @@
 [package]
 name = "antic-sys"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2018"
 authors = ["William Youmans <wyoumans@usf.edu>"]
 description = "Bindings to the Antic library"
@@ -14,5 +14,5 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-flint-sys = "0.4"
-
+flint-sys = "0.5"
+#flint-sys = { path = "../flint-rs/flint-sys" }

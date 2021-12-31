@@ -40,12 +40,12 @@ pub union nf_struct__bindgen_ty_2 {
 }
 pub type nf_t = [nf_struct; 1usize];
 extern "C" {
-    pub fn nf_init(nf: *mut nf_struct, pol: *mut fmpq_poly_struct);
+    pub fn nf_init(nf: *mut nf_struct, pol: *const fmpq_poly_struct);
 }
 extern "C" {
     pub fn nf_init_randtest(
         nf: *mut nf_struct,
-        state: *mut flint_rand_s,
+        state: *const flint_rand_s,
         len: mp_limb_signed_t,
         bits_in: mp_bitcnt_t,
     );
@@ -54,7 +54,7 @@ extern "C" {
     pub fn nf_clear(nf: *mut nf_struct);
 }
 extern "C" {
-    pub fn nf_print(nf: *mut nf_struct);
+    pub fn nf_print(nf: *const nf_struct);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -79,447 +79,447 @@ pub union nf_elem_struct {
 }
 pub type nf_elem_t = [nf_elem_struct; 1usize];
 extern "C" {
-    pub fn nf_elem_init(a: *mut nf_elem_struct, nf: *mut nf_struct);
+    pub fn nf_elem_init(a: *mut nf_elem_struct, nf: *const nf_struct);
 }
 extern "C" {
-    pub fn nf_elem_clear(a: *mut nf_elem_struct, nf: *mut nf_struct);
+    pub fn nf_elem_clear(a: *mut nf_elem_struct, nf: *const nf_struct);
 }
 extern "C" {
     pub fn nf_elem_randtest(
         a: *mut nf_elem_struct,
-        state: *mut flint_rand_s,
+        state: *const flint_rand_s,
         bits: mp_bitcnt_t,
-        nf: *mut nf_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_randtest_not_zero(
         a: *mut nf_elem_struct,
-        state: *mut flint_rand_s,
+        state: *const flint_rand_s,
         bits: mp_bitcnt_t,
-        nf: *mut nf_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
-    pub fn _nf_elem_reduce(a: *mut nf_elem_struct, nf: *mut nf_struct);
+    pub fn _nf_elem_reduce(a: *mut nf_elem_struct, nf: *const nf_struct);
 }
 extern "C" {
-    pub fn nf_elem_reduce(a: *mut nf_elem_struct, nf: *mut nf_struct);
+    pub fn nf_elem_reduce(a: *mut nf_elem_struct, nf: *const nf_struct);
 }
 extern "C" {
     pub fn _nf_elem_invertible_check(
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn _nf_elem_equal(
-        a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        b: *const nf_elem_struct,
+        nf: *const nf_struct,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn nf_elem_equal(
-        a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        b: *const nf_elem_struct,
+        nf: *const nf_struct,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn nf_elem_is_gen(a: *mut nf_elem_struct, nf: *mut nf_struct) -> ::std::os::raw::c_int;
+    pub fn nf_elem_is_gen(a: *const nf_elem_struct, nf: *const nf_struct) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn nf_elem_print_pretty(
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
         var: *const ::std::os::raw::c_char,
     );
 }
 extern "C" {
     pub fn nf_elem_get_str_pretty(
-        a: *mut nf_elem_struct,
+        a: *const nf_elem_struct,
         var: *const ::std::os::raw::c_char,
-        nf: *mut nf_struct,
-    ) -> *mut ::std::os::raw::c_char;
+        nf: *const nf_struct,
+    ) -> *const ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn nf_elem_set_fmpq_poly(
         a: *mut nf_elem_struct,
-        pol: *mut fmpq_poly_struct,
-        nf: *mut nf_struct,
+        pol: *const fmpq_poly_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_set_fmpz_mat_row(
         b: *mut nf_elem_struct,
-        M: *mut fmpz_mat_struct,
+        M: *const fmpz_mat_struct,
         i: mp_limb_signed_t,
-        den: *mut fmpz,
-        nf: *mut nf_struct,
+        den: *const fmpz,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_get_fmpz_mat_row(
         M: *mut fmpz_mat_struct,
         i: mp_limb_signed_t,
-        den: *mut fmpz,
-        b: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        den: *const fmpz,
+        b: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_get_fmpq_poly(
         pol: *mut fmpq_poly_struct,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn _nf_elem_get_nmod_poly(
         pol: *mut nmod_poly_struct,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_get_nmod_poly_den(
         pol: *mut nmod_poly_struct,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
         den: ::std::os::raw::c_int,
     );
 }
 extern "C" {
     pub fn nf_elem_get_nmod_poly(
         pol: *mut nmod_poly_struct,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn _nf_elem_get_fmpz_mod_poly(
         pol: *mut fmpz_mod_poly_struct,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
-        ctx: *mut fmpz_mod_ctx_struct,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
+        ctx: *const fmpz_mod_ctx_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_get_fmpz_mod_poly_den(
         pol: *mut fmpz_mod_poly_struct,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
         den: ::std::os::raw::c_int,
-        ctx: *mut fmpz_mod_ctx_struct,
+        ctx: *const fmpz_mod_ctx_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_get_fmpz_mod_poly(
         pol: *mut fmpz_mod_poly_struct,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
-        ctx: *mut fmpz_mod_ctx_struct,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
+        ctx: *const fmpz_mod_ctx_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_get_coeff_fmpq(
         a: *mut fmpq,
-        b: *mut nf_elem_struct,
+        b: *const nf_elem_struct,
         i: mp_limb_signed_t,
-        nf: *mut nf_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_get_coeff_fmpz(
         a: *mut fmpz,
-        b: *mut nf_elem_struct,
+        b: *const nf_elem_struct,
         i: mp_limb_signed_t,
-        nf: *mut nf_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn _nf_elem_set_coeff_num_fmpz(
         a: *mut nf_elem_struct,
         i: mp_limb_signed_t,
-        b: *mut fmpz,
-        nf: *mut nf_struct,
+        b: *const fmpz,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_add_si(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
+        b: *const nf_elem_struct,
         c: mp_limb_signed_t,
-        nf: *mut nf_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_add_fmpz(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut fmpz,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const fmpz,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_add_fmpq(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut fmpq,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const fmpq,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_sub_si(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
+        b: *const nf_elem_struct,
         c: mp_limb_signed_t,
-        nf: *mut nf_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_sub_fmpz(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut fmpz,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const fmpz,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_sub_fmpq(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut fmpq,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const fmpq,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_si_sub(
         a: *mut nf_elem_struct,
         c: mp_limb_signed_t,
-        b: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_fmpz_sub(
         a: *mut nf_elem_struct,
-        c: *mut fmpz,
-        b: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        c: *const fmpz,
+        b: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_fmpq_sub(
         a: *mut nf_elem_struct,
-        c: *mut fmpq,
-        b: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        c: *const fmpq,
+        b: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_scalar_mul_si(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
+        b: *const nf_elem_struct,
         c: mp_limb_signed_t,
-        nf: *mut nf_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_scalar_mul_fmpz(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut fmpz,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const fmpz,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_scalar_mul_fmpq(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut fmpq,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const fmpq,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_scalar_div_si(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
+        b: *const nf_elem_struct,
         c: mp_limb_signed_t,
-        nf: *mut nf_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_scalar_div_fmpz(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut fmpz,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const fmpz,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_scalar_div_fmpq(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut fmpq,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const fmpq,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn _nf_elem_add_lf(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
         can: ::std::os::raw::c_int,
     );
 }
 extern "C" {
     pub fn _nf_elem_sub_lf(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
         can: ::std::os::raw::c_int,
     );
 }
 extern "C" {
     pub fn _nf_elem_add_qf(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
         can: ::std::os::raw::c_int,
     );
 }
 extern "C" {
     pub fn _nf_elem_sub_qf(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
         can: ::std::os::raw::c_int,
     );
 }
 extern "C" {
     pub fn nf_elem_add_qf(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_sub_qf(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
-    pub fn nf_elem_mul_gen(a: *mut nf_elem_struct, b: *mut nf_elem_struct, nf: *mut nf_struct);
+    pub fn nf_elem_mul_gen(a: *mut nf_elem_struct, b: *const nf_elem_struct, nf: *const nf_struct);
 }
 extern "C" {
     pub fn _nf_elem_mul(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_mul(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn _nf_elem_mul_red(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
         red: ::std::os::raw::c_int,
     );
 }
 extern "C" {
     pub fn nf_elem_mul_red(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
         red: ::std::os::raw::c_int,
     );
 }
 extern "C" {
-    pub fn _nf_elem_inv(a: *mut nf_elem_struct, b: *mut nf_elem_struct, nf: *mut nf_struct);
+    pub fn _nf_elem_inv(a: *mut nf_elem_struct, b: *const nf_elem_struct, nf: *const nf_struct);
 }
 extern "C" {
-    pub fn nf_elem_inv(a: *mut nf_elem_struct, b: *mut nf_elem_struct, nf: *mut nf_struct);
+    pub fn nf_elem_inv(a: *mut nf_elem_struct, b: *const nf_elem_struct, nf: *const nf_struct);
 }
 extern "C" {
     pub fn _nf_elem_div(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_div(
         a: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
-        c: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        b: *const nf_elem_struct,
+        c: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn _nf_elem_pow(
         res: *mut nf_elem_struct,
-        b: *mut nf_elem_struct,
+        b: *const nf_elem_struct,
         e: mp_limb_t,
-        nf: *mut nf_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_pow(
         res: *mut nf_elem_struct,
-        a: *mut nf_elem_struct,
+        a: *const nf_elem_struct,
         e: mp_limb_t,
-        nf: *mut nf_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn _nf_elem_norm(
         rnum: *mut fmpz,
-        rden: *mut fmpz,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        rden: *const fmpz,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
-    pub fn nf_elem_norm(res: *mut fmpq, a: *mut nf_elem_struct, nf: *mut nf_struct);
+    pub fn nf_elem_norm(res: *mut fmpq, a: *const nf_elem_struct, nf: *const nf_struct);
 }
 extern "C" {
     pub fn _nf_elem_norm_div(
         rnum: *mut fmpz,
-        rden: *mut fmpz,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
-        divisor: *mut fmpz,
+        rden: *const fmpz,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
+        divisor: *const fmpz,
         nbits: mp_limb_signed_t,
     );
 }
 extern "C" {
     pub fn nf_elem_norm_div(
         res: *mut fmpq,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
-        divisor: *mut fmpz,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
+        divisor: *const fmpz,
         nbits: mp_limb_signed_t,
     );
 }
@@ -527,81 +527,81 @@ extern "C" {
     pub fn _nf_elem_trace(
         rnum: *mut fmpz,
         rden: *mut fmpz,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
-    pub fn nf_elem_trace(res: *mut fmpq, a: *mut nf_elem_struct, nf: *mut nf_struct);
+    pub fn nf_elem_trace(res: *mut fmpq, a: *const nf_elem_struct, nf: *const nf_struct);
 }
 extern "C" {
-    pub fn nf_elem_rep_mat(res: *mut fmpq_mat_struct, a: *mut nf_elem_struct, nf: *mut nf_struct);
+    pub fn nf_elem_rep_mat(res: *mut fmpq_mat_struct, a: *const nf_elem_struct, nf: *const nf_struct);
 }
 extern "C" {
     pub fn nf_elem_rep_mat_fmpz_mat_den(
         res: *mut fmpz_mat_struct,
-        den: *mut fmpz,
-        a: *mut nf_elem_struct,
-        nf: *mut nf_struct,
+        den: *const fmpz,
+        a: *const nf_elem_struct,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn _nf_elem_mod_fmpz(
         res: *mut nf_elem_struct,
-        a: *mut nf_elem_struct,
-        mod_: *mut fmpz,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        mod_: *const fmpz,
+        nf: *const nf_struct,
         sign: ::std::os::raw::c_int,
     );
 }
 extern "C" {
     pub fn nf_elem_mod_fmpz_den(
         res: *mut nf_elem_struct,
-        a: *mut nf_elem_struct,
-        mod_: *mut fmpz,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        mod_: *const fmpz,
+        nf: *const nf_struct,
         den: ::std::os::raw::c_int,
     );
 }
 extern "C" {
     pub fn nf_elem_smod_fmpz_den(
         res: *mut nf_elem_struct,
-        a: *mut nf_elem_struct,
-        mod_: *mut fmpz,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        mod_: *const fmpz,
+        nf: *const nf_struct,
         den: ::std::os::raw::c_int,
     );
 }
 extern "C" {
     pub fn nf_elem_mod_fmpz(
         res: *mut nf_elem_struct,
-        a: *mut nf_elem_struct,
-        mod_: *mut fmpz,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        mod_: *const fmpz,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_smod_fmpz(
         res: *mut nf_elem_struct,
-        a: *mut nf_elem_struct,
-        mod_: *mut fmpz,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        mod_: *const fmpz,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_coprime_den(
         res: *mut nf_elem_struct,
-        a: *mut nf_elem_struct,
-        mod_: *mut fmpz,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        mod_: *const fmpz,
+        nf: *const nf_struct,
     );
 }
 extern "C" {
     pub fn nf_elem_coprime_den_signed(
         res: *mut nf_elem_struct,
-        a: *mut nf_elem_struct,
-        mod_: *mut fmpz,
-        nf: *mut nf_struct,
+        a: *const nf_elem_struct,
+        mod_: *const fmpz,
+        nf: *const nf_struct,
     );
 }
 #[repr(C)]
@@ -620,7 +620,7 @@ pub struct qfb_hash_t {
     pub iter: mp_limb_signed_t,
 }
 extern "C" {
-    pub fn qfb_hash_init(depth: mp_limb_signed_t) -> *mut qfb_hash_t;
+    pub fn qfb_hash_init(depth: mp_limb_signed_t) -> *const qfb_hash_t;
 }
 extern "C" {
     pub fn qfb_hash_clear(qhash: *mut qfb_hash_t, depth: mp_limb_signed_t);
@@ -628,8 +628,8 @@ extern "C" {
 extern "C" {
     pub fn qfb_hash_insert(
         qhash: *mut qfb_hash_t,
-        q: *mut qfb,
-        q2: *mut qfb,
+        q: *const qfb,
+        q2: *const qfb,
         iter: mp_limb_signed_t,
         depth: mp_limb_signed_t,
     );
@@ -637,15 +637,15 @@ extern "C" {
 extern "C" {
     pub fn qfb_hash_find(
         qhash: *mut qfb_hash_t,
-        q: *mut qfb,
+        q: *const qfb,
         depth: mp_limb_signed_t,
     ) -> mp_limb_signed_t;
 }
 extern "C" {
-    pub fn qfb_reduce(r: *mut qfb, f: *mut qfb, D: *mut fmpz);
+    pub fn qfb_reduce(r: *mut qfb, f: *const qfb, D: *const fmpz);
 }
 extern "C" {
-    pub fn qfb_is_reduced(r: *mut qfb) -> ::std::os::raw::c_int;
+    pub fn qfb_is_reduced(r: *const qfb) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn qfb_reduced_forms(forms: *mut *mut qfb, d: mp_limb_signed_t) -> mp_limb_signed_t;
@@ -654,28 +654,28 @@ extern "C" {
     pub fn qfb_reduced_forms_large(forms: *mut *mut qfb, d: mp_limb_signed_t) -> mp_limb_signed_t;
 }
 extern "C" {
-    pub fn qfb_nucomp(r: *mut qfb, f: *mut qfb, g: *mut qfb, D: *mut fmpz, L: *mut fmpz);
+    pub fn qfb_nucomp(r: *mut qfb, f: *const qfb, g: *const qfb, D: *const fmpz, L: *const fmpz);
 }
 extern "C" {
-    pub fn qfb_nudupl(r: *mut qfb, f: *mut qfb, D: *mut fmpz, L: *mut fmpz);
+    pub fn qfb_nudupl(r: *mut qfb, f: *const qfb, D: *const fmpz, L: *const fmpz);
 }
 extern "C" {
-    pub fn qfb_pow_ui(r: *mut qfb, f: *mut qfb, D: *mut fmpz, exp: mp_limb_t);
+    pub fn qfb_pow_ui(r: *mut qfb, f: *const qfb, D: *const fmpz, exp: mp_limb_t);
 }
 extern "C" {
-    pub fn qfb_pow(r: *mut qfb, f: *mut qfb, D: *mut fmpz, exp: *mut fmpz);
+    pub fn qfb_pow(r: *mut qfb, f: *const qfb, D: *const fmpz, exp: *const fmpz);
 }
 extern "C" {
-    pub fn qfb_pow_with_root(r: *mut qfb, f: *mut qfb, D: *mut fmpz, e: *mut fmpz, L: *mut fmpz);
+    pub fn qfb_pow_with_root(r: *mut qfb, f: *const qfb, D: *const fmpz, e: *const fmpz, L: *const fmpz);
 }
 extern "C" {
-    pub fn qfb_prime_form(r: *mut qfb, D: *mut fmpz, p: *mut fmpz);
+    pub fn qfb_prime_form(r: *mut qfb, D: *const fmpz, p: *const fmpz);
 }
 extern "C" {
     pub fn qfb_exponent_element(
         exponent: *mut fmpz,
-        f: *mut qfb,
-        n: *mut fmpz,
+        f: *const qfb,
+        n: *const fmpz,
         B1: mp_limb_t,
         B2_sqrt: mp_limb_t,
     ) -> ::std::os::raw::c_int;
@@ -683,7 +683,7 @@ extern "C" {
 extern "C" {
     pub fn qfb_exponent(
         exponent: *mut fmpz,
-        n: *mut fmpz,
+        n: *const fmpz,
         B1: mp_limb_t,
         B2_sqrt: mp_limb_t,
         c: mp_limb_signed_t,
@@ -692,7 +692,7 @@ extern "C" {
 extern "C" {
     pub fn qfb_exponent_grh(
         exponent: *mut fmpz,
-        n: *mut fmpz,
+        n: *const fmpz,
         B1: mp_limb_t,
         B2_sqrt: mp_limb_t,
     ) -> ::std::os::raw::c_int;
