@@ -4,14 +4,7 @@ use flint_sys::fmpq_poly::{fmpq_poly_powers_precomp_t, fmpq_poly_struct, fmpq_po
 use flint_sys::fmpz::fmpz_preinvn_t;
 use flint_sys::fmpz_poly::fmpz_poly_powers_precomp_t;
 
-use libc::{c_long, c_ulong};
-
-pub const NF_POWERS_CUTOFF: c_ulong = 30;
-pub const NF_GENERIC: c_ulong = 0;
-pub const NF_MONIC: c_ulong = 1;
-pub const NF_LINEAR: c_ulong = 2;
-pub const NF_QUADRATIC: c_ulong = 4;
-pub const NF_GAUSSIAN: c_ulong = 8;
+use libc::c_long;
 
 extern "C" {
     pub fn antic_test_multiplier() -> c_long;
