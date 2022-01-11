@@ -558,3 +558,27 @@ extern "C" {
         nf: *const nf_struct,
     );
 }
+
+/*
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::mem::MaybeUninit;
+
+    fn testing() {
+        let mut pol = MaybeUninit::uninit();
+        let mut k = MaybeUninit::uninit();
+        let mut x = MaybeUninit::uninit();
+        let mut y = MaybeUninit::uninit();
+
+        unsafe {
+            flint_sys::fmpq_poly::fmpq_poly_init(pol.as_mut_ptr());
+            flint_sys::fmpq_poly::fmpq_poly_set_coeff_ui(pol.as_mut_ptr(), 4, 1);
+            flint_sys::fmpq_poly::fmpq_poly_set_coeff_ui(pol.as_mut_ptr(), 0, 1);
+
+            crate::nf::nf_init(k.as_mut_ptr(), pol.as_ptr());
+            crate::nf_elem::nf_elem_init(x.as_mut_ptr(), k.as_ptr());
+            crate::nf_elem::nf_elem_init(y.as_mut_ptr(), k.as_ptr());
+        }
+    }
+}*/
