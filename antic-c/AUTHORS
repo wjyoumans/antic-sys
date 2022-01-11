@@ -1,0 +1,5 @@
+* William Hart wrote the qfb module and initial nf and nf_elem modules
+
+* Michael Jacobson kindly provided detailed information about his NUCOMP implementation and suggested numerous other tricks.
+
+* Claus Fieker, Tommy Hofmann and Vincent Delecroix contributed patches

@@ -1,0 +1,11 @@
+Instructions on installing antic
+--------------------------------
+
+ANTIC follows a standard installation format for installation
+
+./configure
+make
+make check
+make install
+
+Note that ANTIC needs flint (see http://flintlib.org).

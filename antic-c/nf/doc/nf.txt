@@ -1,0 +1,32 @@
+/*=============================================================================
+
+    This file is part of Antic.
+
+    Antic is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version. See <http://www.gnu.org/licenses/>.
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2013 William Hart
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Initialisation
+
+*******************************************************************************
+
+void nf_init(nf_t nf, fmpq_poly_t pol)
+
+    Perform basic initialisation of a number field (for element arithmetic)
+    given a defining polynomial over $\Q$. 
+
+void nf_clear(nf_t nf)
+
+    Release resources used by a number field object. The object will need
+    initialisation again before it can be used.
+
