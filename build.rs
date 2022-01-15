@@ -1,8 +1,4 @@
 
-#[cfg(unix)]
-use std::os::unix::fs as unix_fs;
-#[cfg(windows)]
-use std::os::windows::fs as windows_fs;
 use std::{
     env,
     ffi::{OsStr, OsString},
@@ -13,7 +9,14 @@ use std::{
     str,
 };
 
-const ANTIC_DIR: &str = "antic-c";
+const ANTIC_DIR: &str = "antic-2847326-c";
+const ANTIC_LIB: &str = "libantic.a";
+const ANTIC_VER: &str = "2847326";
+const ANTIC_HEADERS: &[&str] = &[
+    "nf.h",
+    "nf_elem.h",
+    "qfb.h"
+];
 
 #[derive(Clone, Copy, PartialEq)]
 enum Target {
@@ -24,14 +27,13 @@ enum Target {
 
 struct Environment {
     target: Target,
+    flint_dir: PathBuf,
     src_dir: PathBuf,
     out_dir: PathBuf,
     lib_dir: PathBuf,
     include_dir: PathBuf,
     build_dir: PathBuf,
     cache_dir: Option<PathBuf>,
-    version_prefix: String,
-    version_patch: Option<u64>,
 }
 
 fn main() {
@@ -54,10 +56,9 @@ fn main() {
         Target::Other
     };
 
+    let flint_dir = PathBuf::from(cargo_env("DEP_FLINT_OUT_DIR"));
     let src_dir = PathBuf::from(cargo_env("CARGO_MANIFEST_DIR"));
     let out_dir = PathBuf::from(cargo_env("OUT_DIR"));
-
-    let (version_prefix, version_patch) = get_version();
 
     println!("cargo:rerun-if-env-changed=ANTIC_SYS_CACHE");
     let cache_dir = match env::var_os("ANTIC_SYS_CACHE") {
@@ -66,7 +67,7 @@ fn main() {
         None => system_cache_dir().map(|c| c.join("antic-sys")),
     };
     let cache_dir = cache_dir
-        .map(|cache| cache.join(&version_prefix))
+        .map(|cache| cache.join(&ANTIC_VER))
         .map(|cache| match cc_cache_dir {
             Some(dir) => cache.join(dir),
             None => cache,
@@ -74,14 +75,13 @@ fn main() {
 
     let env = Environment {
         target,
+        flint_dir,
         src_dir,
         out_dir: out_dir.clone(),
         lib_dir: out_dir.join("lib"),
         include_dir: out_dir.join("include"),
         build_dir: out_dir.join("build"),
         cache_dir,
-        version_prefix,
-        version_patch,
     };
        
     // make sure we have target directories
@@ -92,175 +92,60 @@ fn main() {
 }
 
 fn compile(env: &Environment) {
-    let antic_ah = (
-        env.lib_dir.join("libantic.a"), 
-        env.include_dir.join("nf.h"), 
-        env.include_dir.join("nf_elem.h"), 
-        env.include_dir.join("qfb.h")
-        );
-    if need_compile(env, &antic_ah) {
+    if need_compile(env) {
         check_for_msvc(env);
         remove_dir_or_panic(&env.build_dir);
-        create_dir_or_panic(&env.build_dir);
-        link_dir(&env.src_dir.join(ANTIC_DIR), &env.build_dir.join("antic-src"));
-        let (ref a, ref nf_h, ref nf_elem_h, ref qfb_h) = antic_ah;
-        build(env, a, nf_h, nf_elem_h, qfb_h);
-        if !there_is_env("CARGO_FEATURE_CNODELETE") {
-            remove_dir_or_panic(&env.build_dir);
-        }
-        assert!(save_cache(env, &antic_ah));
+        copy_dir_or_panic(&env.src_dir.join(ANTIC_DIR), &env.build_dir);
+        build(env);
+        assert!(save_cache(env));
     }
     write_link_info(env);
 }
 
-
-fn get_version() -> (String, Option<u64>) {
-    let version = cargo_env("CARGO_PKG_VERSION")
-        .into_string()
-        .unwrap_or_else(|e| panic!("version not in utf-8: {:?}", e));
-    let last_dot = version
-        .rfind('.')
-        .unwrap_or_else(|| panic!("version has no dots: {}", version));
-    if last_dot == 0 {
-        panic!("version starts with dot: {}", version);
+fn need_compile(env: &Environment) -> bool {
+    let mut ok = env.lib_dir.join(ANTIC_LIB).is_file();  
+    for h in ANTIC_HEADERS {
+        ok = ok && env.include_dir.join(h).is_file();
     }
-    match version[last_dot + 1..].parse::<u64>() {
-        Ok(patch) => {
-            let mut v = version;
-            v.truncate(last_dot);
-            (v, Some(patch))
-        }
-        Err(_) => (version, None),
-    }
-}
 
-fn need_compile(
-    env: &Environment,
-    antic_ah: &(PathBuf, PathBuf, PathBuf, PathBuf),
-) -> bool {
-    let antic_fine = antic_ah.0.is_file() 
-        && antic_ah.1.is_file()
-        && antic_ah.2.is_file()
-        && antic_ah.3.is_file();
-    if antic_fine {
+    if ok {
         if should_save_cache(env) {
-            assert!(save_cache(env, antic_ah));
+            assert!(save_cache(env));
         }
         return false;
-    } else if load_cache(env, antic_ah) {
+    } else if load_cache(env) {
         // if loading cache works, we're done
         return false;
     }
-    !antic_fine
+    true
 }
 
-fn save_cache(
-    env: &Environment,
-    antic_ah: &(PathBuf, PathBuf, PathBuf, PathBuf),
-) -> bool {
+fn save_cache(env: &Environment) -> bool {
     let cache_dir = match env.cache_dir {
         Some(ref s) => s,
         None => return false,
     };
-    let version_dir = match env.version_patch {
-        None => cache_dir.join(&env.version_prefix),
-        Some(patch) => cache_dir.join(format!("{}.{}", env.version_prefix, patch)),
-    };
-    let mut ok = create_dir(&version_dir).is_ok();
-    let dir = version_dir;
-    let (ref a, ref nf_h, ref nf_elem_h, ref qfb_h) = *antic_ah;
-    ok = ok && copy_file(a, &dir.join("libantic.a")).is_ok();
-    ok = ok && copy_file(nf_h, &dir.join("nf.h")).is_ok();
-    ok = ok && copy_file(nf_elem_h, &dir.join("nf_elem.h")).is_ok();
-    ok = ok && copy_file(qfb_h, &dir.join("qfb.h")).is_ok();
+    let mut ok = create_dir(&cache_dir).is_ok();
+    ok = ok && copy_file(&env.lib_dir.join(ANTIC_LIB), &cache_dir.join(ANTIC_LIB)).is_ok();
+
+    for h in ANTIC_HEADERS {
+        ok = ok && copy_file(&env.include_dir.join(h), &cache_dir.join(h)).is_ok();
+    }
     ok
 }
 
-fn cache_directories(env: &Environment, base: &Path) -> Vec<(PathBuf, Option<u64>)> {
-    let dir = match fs::read_dir(base) {
-        Ok(dir) => dir,
-        Err(_) => return Vec::new(),
-    };
-    let mut vec = Vec::new();
-    for entry in dir {
-        let path = match entry {
-            Ok(e) => e.path(),
-            Err(_) => continue,
-        };
-        if !path.is_dir() {
-            continue;
-        }
-        let patch = {
-            let file_name = match path.file_name() {
-                Some(name) => name,
-                None => continue,
-            };
-            let path_str = match file_name.to_str() {
-                Some(p) => p,
-                None => continue,
-            };
-            if path_str == env.version_prefix {
-                None
-            } else if !path_str.starts_with(&env.version_prefix)
-                || !path_str[env.version_prefix.len()..].starts_with('.')
-            {
-                continue;
-            } else {
-                match path_str[env.version_prefix.len() + 1..].parse::<u64>() {
-                    Ok(patch) => Some(patch),
-                    Err(_) => continue,
-                }
-            }
-        };
-        vec.push((path, patch));
-    }
-    vec.sort_by_key(|k| k.1);
-    vec
-}
-
-fn load_cache(
-    env: &Environment,
-    antic_ah: &(PathBuf, PathBuf, PathBuf, PathBuf),
-) -> bool {
+fn load_cache(env: &Environment) -> bool {
     let cache_dir = match env.cache_dir {
         Some(ref s) => s,
         None => return false,
     };
-    let env_version_patch = env.version_patch;
-    let cache_dirs = cache_directories(env, cache_dir)
-        .into_iter()
-        .rev()
-        .filter(|x| match env_version_patch {
-            None => x.1.is_none(),
-            Some(patch) => x.1.map(|p| p >= patch).unwrap_or(false),
-        })
-        .collect::<Vec<_>>();
-    let suffixes: &[Option<&str>] = &[None];
-    for suffix in suffixes {
-        for (version_dir, _) in &cache_dirs {
-            let joined;
-            let dir = if let Some(suffix) = suffix {
-                joined = version_dir.join(suffix);
-                &joined
-            } else {
-                version_dir
-            };
-            let mut ok = true;
-            let (ref a, ref nf_h, ref nf_elem_h, ref qfb_h) = *antic_ah;
-            ok = ok && copy_file(&dir.join("libantic.a"), a).is_ok();
-            let header_nf = dir.join("nf.h");
-            ok = ok && copy_file(&header_nf, nf_h).is_ok();
-            let header_nf_elem = dir.join("nf_elem.h");
-            ok = ok && copy_file(&header_nf_elem, nf_elem_h).is_ok();
-            let header_qfb = dir.join("qfb.h");
-            ok = ok && copy_file(&header_qfb, qfb_h).is_ok();
+    let mut ok = true;
+    ok = ok && copy_file(&cache_dir.join(ANTIC_LIB), &env.lib_dir.join(ANTIC_LIB)).is_ok();
 
-            if ok {
-                return true;
-            }
-        }
+    for h in ANTIC_HEADERS {
+        ok = ok && copy_file(&cache_dir.join(h), &env.include_dir.join(h)).is_ok();
     }
-    false
+    ok
 }
 
 fn should_save_cache(env: &Environment) -> bool {
@@ -268,51 +153,33 @@ fn should_save_cache(env: &Environment) -> bool {
         Some(ref s) => s,
         None => return false,
     };
-    let cache_dirs = cache_directories(env, cache_dir)
-        .into_iter()
-        .rev()
-        .filter(|x| match env.version_patch {
-            None => x.1.is_none(),
-            Some(patch) => x.1.map(|p| p >= patch).unwrap_or(false),
-        })
-        .collect::<Vec<_>>();
-    let suffixes: &[Option<&str>] = &[None];
-    for suffix in suffixes {
-        for (version_dir, _) in &cache_dirs {
-            let joined;
-            let dir = if let Some(suffix) = suffix {
-                joined = version_dir.join(suffix);
-                &joined
-            } else {
-                version_dir
-            };
-            let mut ok = true;
-            ok = ok && dir.join("libantic.a").is_file();
-            ok = ok && dir.join("nf.h").is_file();
-            ok = ok && dir.join("nf_elem.h").is_file();
-            ok = ok && dir.join("qfb.h").is_file();
-            if ok {
-                return false;
-            }
-        }
+    let mut ok = true;
+    ok = ok && cache_dir.join(ANTIC_LIB).is_file();
+
+    for h in ANTIC_HEADERS {
+        ok = ok && cache_dir.join(h).is_file();
     }
-    true
+    !ok
 }
 
-fn build(env: &Environment, lib: &Path, nf_h: &Path, nf_elem_h: &Path, qfb_h: &Path) {
-    let build_dir = env.build_dir.join("antic-src");
-    println!("$ cd {:?}", build_dir);
-    let conf = String::from("./configure --disable-shared");
-    configure(&build_dir, &OsString::from(conf));
-    make_and_check(env, &build_dir);
-    let build_lib = build_dir.join("libantic.a");
-    copy_file_or_panic(&build_lib, lib);
-    let build_nf_h = build_dir.join("nf.h");
-    copy_file_or_panic(&build_nf_h, nf_h);
-    let build_nf_elem_h = build_dir.join("nf_elem.h");
-    copy_file_or_panic(&build_nf_elem_h, nf_elem_h);
-    let build_qfb_h = build_dir.join("qfb.h");
-    copy_file_or_panic(&build_qfb_h, qfb_h);
+fn build(env: &Environment) {
+    println!("$ cd {:?}", &env.build_dir);
+    let conf = String::from(
+        format!(
+            "./configure --disable-shared --with-flint={}",
+            env.flint_dir.display(),
+            )
+        );
+
+    configure(&env.build_dir, &OsString::from(conf));
+    make_and_check(env, &env.build_dir);
+
+    let build_lib = &env.build_dir.join(ANTIC_LIB);
+    copy_file_or_panic(&build_lib, &env.lib_dir.join(ANTIC_LIB));
+    
+    for h in ANTIC_HEADERS {
+        copy_file_or_panic(&env.build_dir.join(h), &env.include_dir.join(h));
+    }
 }
 
 fn write_link_info(env: &Environment) {
@@ -334,10 +201,12 @@ fn write_link_info(env: &Environment) {
             env.include_dir.display()
         )
     });
+
     println!("cargo:out_dir={}", out_str);
     println!("cargo:lib_dir={}", lib_str);
     println!("cargo:include_dir={}", include_str);
     println!("cargo:rustc-link-search=native={}", lib_str);
+    println!("cargo:rustc-link-lib=static=flint");
     println!("cargo:rustc-link-lib=static=antic");
 }
 
@@ -345,10 +214,6 @@ fn write_link_info(env: &Environment) {
 fn cargo_env(name: &str) -> OsString {
     env::var_os(name)
         .unwrap_or_else(|| panic!("environment variable not found: {}, please use cargo", name))
-}
-
-fn there_is_env(name: &str) -> bool {
-    env::var_os(name).is_some()
 }
 
 fn check_for_msvc(env: &Environment) {
@@ -379,6 +244,59 @@ fn create_dir_or_panic(dir: &Path) {
     create_dir(dir).unwrap_or_else(|_| panic!("Unable to create directory: {:?}", dir));
 }
 
+pub fn copy_dir(from: &Path, to: &Path) -> IoResult<()> {
+    let mut stack = Vec::new();
+    stack.push(PathBuf::from(from));
+
+    let output_root = PathBuf::from(to);
+    let input_root = PathBuf::from(from).components().count();
+
+    while let Some(working_path) = stack.pop() {
+        println!("process: {:?}", &working_path);
+
+        // Generate a relative path
+        let src: PathBuf = working_path.components().skip(input_root).collect();
+
+        // Create a destination if missing
+        let dest = if src.components().count() == 0 {
+            output_root.clone()
+        } else {
+            output_root.join(&src)
+        };
+        if fs::metadata(&dest).is_err() {
+            println!("$ mkdir {:?}", dest);
+            fs::create_dir_all(&dest)?;
+        }
+
+        for entry in fs::read_dir(working_path)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_dir() {
+                stack.push(path);
+            } else {
+                match path.file_name() {
+                    Some(filename) => {
+                        let dest_path = dest.join(filename);
+                        println!("  copy: {:?} -> {:?}", &path, &dest_path);
+                        fs::copy(&path, &dest_path)?;
+                    }
+                    None => {
+                        println!("failed: {:?}", path);
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn copy_dir_or_panic(src: &Path, dst: &Path) {
+    copy_dir(src, dst).unwrap_or_else(|_| {
+        panic!("Unable to copy {:?} -> {:?}", src, dst);
+    });
+}
+
 fn copy_file(src: &Path, dst: &Path) -> IoResult<u64> {
     println!("$ cp {:?} {:?}", src, dst);
     fs::copy(src, dst)
@@ -400,32 +318,14 @@ fn make_and_check(_env: &Environment, build_dir: &Path) {
     let mut make = Command::new("make");
     make.current_dir(build_dir);
     execute(make);
-    
-    let mut make_check = Command::new("make");
-    make_check
-        .current_dir(build_dir)
-        .arg("check");
-    execute(make_check);
-}
 
-#[cfg(unix)]
-fn link_dir(src: &Path, dst: &Path) {
-    println!("$ ln -s {:?} {:?}", src, dst);
-    unix_fs::symlink(src, dst).unwrap_or_else(|_| {
-        panic!("Unable to symlink {:?} -> {:?}", src, dst);
-    });
-}
-
-#[cfg(windows)]
-fn link_dir(src: &Path, dst: &Path) {
-    println!("$ ln -s {:?} {:?}", src, dst);
-    if windows_fs::symlink_dir(src, dst).is_ok() {
-        return;
+    if !cfg!(feature = "disable-make-check") {
+        let mut make_check = Command::new("make");
+        make_check
+            .current_dir(build_dir)
+            .arg("check");
+        execute(make_check);
     }
-    println!("symlink_dir: failed to create symbolic link, copying instead");
-    let mut c = Command::new("cp");
-    c.arg("-R").arg(src).arg(dst);
-    execute(c);
 }
 
 fn execute(mut command: Command) {

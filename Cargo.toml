@@ -1,6 +1,6 @@
 [package]
 name = "antic-sys"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2018"
 authors = ["William Youmans <wyoumans@usf.edu>"]
 description = "Bindings to the Antic library"
@@ -15,5 +15,12 @@ readme = "README.md"
 
 [dependencies]
 libc = "0.2"
-gmp-mpfr-sys = "1.4"
-flint-sys = "0.5"
+#flint-sys = { version = "0.6", features = ["disable-make-check"] }
+flint-sys = { path = "../flint-rs/flint-sys", features = ["disable-make-check"] }
+
+[features]
+disable-make-check = []
+
+[target.'cfg(target_os = "windows")'.build-dependencies.winapi]
+version = "0.3"
+features = ["combaseapi", "knownfolders", "shlobj", "winbase", "winerror"]

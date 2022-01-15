@@ -4,9 +4,10 @@ Rust bindings to the [Antic](https://github.com/wbhart/antic) library.
 
 Antic is an algebraic number theory library.
 
+## Optional features
+
+  * `disable-make-check`: this can reduce compilation time significantly.
+
 ## Notes
-
-`Antic-sys` has `flint-sys` as a dependency. At the moment, `flint-sys` requires the user to have [Flint](https://flintlib.org/doc/index.html) installed and accesible in your `$PATH`.
-
-This crate will build Antic from source so it is not required to be pre-installed. This process is still experimental so please report any issues.
-
+  
+  * As of version 0.3.0 the Antic source files are now included and the library is compiled automatically. The files are cached to avoid unnecessary compilations.
