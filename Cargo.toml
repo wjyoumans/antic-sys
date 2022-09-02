@@ -1,6 +1,6 @@
 [package]
 name = "antic-sys"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2018"
 authors = ["William Youmans <wyoumans@usf.edu>"]
 description = "Bindings to the Antic library"
@@ -16,7 +16,7 @@ readme = "README.md"
 [dependencies]
 libc = "0.2"
 gmp-mpfr-sys = "1.4"
-flint-sys = { version = "0.6", features = ["disable-make-check"] }
+flint-sys = { version = "0.7", features = ["disable-make-check"] }
 
 [features]
 disable-make-check = []
