@@ -14,9 +14,10 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+derivative = "2.0"
 libc = "0.2"
 gmp-mpfr-sys = "1.4"
-flint-sys = { version = "0.7", features = ["disable-make-check"] }
+flint-sys = { path = "../flint-rs/flint-sys", version = "0.7", features = ["disable-make-check"] }
 
 [features]
 default = ["disable-make-check"]
